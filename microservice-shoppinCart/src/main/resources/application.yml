@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: microservice-shoppingCartService
+  profiles:
+    active: development
+  config:
+    import: optional:configserver:http://root:123456@localhost:7070
+  jpa:
+    open-in-view: false
