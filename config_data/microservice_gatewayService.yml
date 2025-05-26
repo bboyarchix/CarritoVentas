@@ -1,0 +1,76 @@
+server:
+  port: 8091
+  address: 0.0.0.0
+
+eureka:
+  client:
+    serviceUrl:
+      #defaultZone: http://localhost:8090/eureka
+      defaultZone: ${EUREKA_URI:http://localhost:8090/eureka}
+  instance:
+    #hostname: localhost
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173" # Cambia esto por el origen de tu frontend
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      discovery:
+        locator:
+          enable: true
+      routes:
+        - id: microservice-catalogService
+          uri: lb://microservice-catalogService
+          predicates:
+            - Path=/category/**, /subCategory/**, /product/**
+
+        - id: microservice-customerService
+          uri: lb://microservice-customerService
+          predicates:
+            - Path=/customer/**
+
+        - id: microservice-inventory
+          uri: lb://microservice-inventory
+          predicates:
+            - Path=/inventory/**
+          filters:
+            - StripPrefix=1
+
+        - id: microservice-pedidoService
+          uri: lb://microservice-pedidoService
+          predicates:
+            - Path=/pedido/**, /pedidoDetalle/**
+          filters:
+            - AuthFilter
+
+        - id: microservice-shoppinCartService
+          uri: lb://microservice-shoppinCartService
+          predicates:
+            - Path=/shopingCart/*, /shopingCartItem/*
+
+        - id: microservice-descuentoService
+          uri: lb://microservice-descuentoService
+          predicates:
+            - Path=/descuento/**
+
+        - id: microservice-vendorService
+          uri: lb://microservice-vendorService
+          predicates:
+            - Path=/vendor/**
+
+        - id: microservice-authService
+          uri: lb://microservice-authService
+          predicates:
+            - Path=/api/auth/**
+
+        - id: microservice-paymentService
+          uri: lb://microservice-paymentService
+          predicates:
+            - Path=/payment/**,
